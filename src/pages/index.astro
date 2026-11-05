@@ -74,6 +74,7 @@ import { questions, questionsPerRound, rules } from '../quiz';
             <div class="flex items-center justify-between gap-2 text-sm font-bold">
               <span id="q-count" class="rounded-full bg-brand/10 px-3 py-1 text-brand">Question 1 / {questionsPerRound}</span>
               <span class="flex items-center gap-2">
+                <button id="sound-toggle" type="button" aria-label="Sound on" class="rounded-full bg-ink/5 px-3 py-1 hover:bg-ink/10">🔊</button>
                 <span id="q-streak-box" class="rounded-full bg-orange-100 px-3 py-1 text-orange-600 opacity-40 transition">🔥 <span id="q-streak">0</span></span>
                 <span class="rounded-full bg-sun/25 px-3 py-1">⭐ <span id="q-score">0</span></span>
               </span>
@@ -167,6 +168,66 @@ import { questions, questionsPerRound, rules } from '../quiz';
     void (el as HTMLElement).offsetWidth;
     el.classList.add(animation);
   }
+
+  // SOUNDS — little game beeps made by the browser (no sound files needed).
+  // Each note is [frequency in Hz, start time in seconds, length in seconds].
+  const SOUNDS = {
+    right: [[659, 0, 0.12], [988, 0.1, 0.22]],
+    wrong: [[196, 0, 0.18], [147, 0.15, 0.3]],
+    streak: [[784, 0, 0.1], [988, 0.08, 0.1], [1319, 0.16, 0.25]],
+    finish: [[523, 0, 0.15], [659, 0.15, 0.15], [784, 0.3, 0.15], [1047, 0.45, 0.45]],
+  } as const;
+  let audio: AudioContext | null = null;
+  let soundOn = true;
+  try {
+    soundOn = localStorage.getItem('quiz-sound') !== 'off';
+  } catch {}
+
+  function sound(name: keyof typeof SOUNDS) {
+    if (!soundOn) return;
+    try {
+      audio ??= new AudioContext();
+      const now = audio.currentTime;
+      for (const [freq, start, length] of SOUNDS[name]) {
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        osc.type = name === 'wrong' ? 'square' : 'triangle';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, now + start);
+        gain.gain.exponentialRampToValueAtTime(name === 'wrong' ? 0.08 : 0.25, now + start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + length);
+        osc.connect(gain).connect(audio.destination);
+        osc.start(now + start);
+        osc.stop(now + start + length + 0.05);
+      }
+    } catch {}
+  }
+
+  // Reads an English sentence out loud with the phone or computer's voice.
+  function speak(text: string) {
+    if (!('speechSynthesis' in window)) return;
+    const say = new SpeechSynthesisUtterance(text);
+    say.lang = 'en-US';
+    say.rate = 0.85;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(say);
+  }
+
+  function drawSoundButton() {
+    const button = $('sound-toggle');
+    button.textContent = soundOn ? '🔊' : '🔇';
+    button.setAttribute('aria-label', soundOn ? 'Sound on' : 'Sound off');
+  }
+  $('sound-toggle').addEventListener('click', () => {
+    soundOn = !soundOn;
+    try {
+      localStorage.setItem('quiz-sound', soundOn ? 'on' : 'off');
+    } catch {}
+    drawSoundButton();
+    if (soundOn) sound('right');
+    else window.speechSynthesis?.cancel();
+  });
+  drawSoundButton();
 
   // Little emojis that fall from the middle of the screen.
   function confetti(emojis: string[], count = 18) {
@@ -283,6 +344,9 @@ import { questions, questionsPerRound, rules } from '../quiz';
       play($('q-blank'), 'anim-pop');
       confetti(streak >= 3 ? ['🔥', '⭐', '🎉'] : ['⭐', '✨', '🎉']);
       if (streak >= 2) play($('q-streak-box'), 'anim-pop');
+      sound(streak >= 3 ? 'streak' : 'right');
+    } else {
+      sound('wrong');
     }
 
     const praise = PRAISE[Math.floor(Math.random() * PRAISE.length)];
@@ -295,7 +359,11 @@ import { questions, questionsPerRound, rules } from '../quiz';
           : '❌ Not quite. <span lang="km">មិនទាន់ត្រូវទេ។</span>'
       }</p>
       <p class="mt-1">${escape(q.why)}</p>
-      <p class="km" lang="km">${escape(q.whyKm)}</p>`;
+      <p class="km" lang="km">${escape(q.whyKm)}</p>
+      <button type="button" id="q-listen" class="mt-3 rounded-full bg-white px-4 py-2 text-sm font-bold text-brand ring-1 ring-brand/30 hover:bg-brand/5">
+        🗣️ Listen <span lang="km" class="font-khmer font-normal">ស្តាប់</span>
+      </button>`;
+    $('q-listen').addEventListener('click', () => speak(q.sentence.replace('___', right)));
 
     const next = $('q-next');
     next.innerHTML =
@@ -328,6 +396,7 @@ import { questions, questionsPerRound, rules } from '../quiz';
     play($('r-emoji'), 'anim-pop');
     $('r-message').innerHTML = message;
     if (stars >= 2) confetti(['🎉', '⭐', '🏆', '✨'], 36);
+    sound(stars >= 1 ? 'finish' : 'wrong');
 
     const list = $('r-list');
     list.innerHTML = mistakes
