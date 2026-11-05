@@ -12,8 +12,8 @@
 @theme {
   --color-ink: #1d1a2e;        /* main text */
   --color-paper: #fbf7f0;      /* page background */
-  --color-brand: #e2552f;      /* main accent (buttons, highlights) */
-  --color-brand-dark: #b83d1c;
+  --color-brand: #4053d6;      /* main accent (buttons, highlights) */
+  --color-brand-dark: #2f3fae;
   --color-sun: #f4b33d;        /* second accent */
   --color-leaf: #2f7d63;       /* third accent */
   --color-muted: #6b6578;      /* quieter text */
@@ -58,3 +58,42 @@ html {
   h1 > .km { margin-top: 0.3em; font-size: 0.5em; font-weight: 600; letter-spacing: 0; }
 }
 
+
+/*
+  QUIZ ANIMATIONS — small moves that make the quiz feel like a game.
+  pop: a right answer jumps · shake: a wrong answer shakes ·
+  float: emojis drift up and down · confetti: emojis fall after a right answer.
+*/
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-14px) rotate(6deg); }
+}
+@keyframes confetti {
+  from { transform: translate(0, 0) rotate(0); opacity: 1; }
+  to { transform: translate(var(--dx), 70vh) rotate(var(--spin)); opacity: 0; }
+}
+.anim-pop { animation: pop 0.45s ease; }
+.anim-shake { animation: shake 0.45s ease; }
+.anim-float { animation: float 4s ease-in-out infinite; }
+.confetti-bit {
+  position: fixed;
+  top: 30vh;
+  pointer-events: none;
+  z-index: 50;
+  font-size: 1.6rem;
+  animation: confetti 1.4s ease-in forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-pop, .anim-shake, .anim-float, .confetti-bit { animation: none; }
+  .confetti-bit { display: none; }
+}
