@@ -1,0 +1,411 @@
+---
+// THE STORY PAGE: "A Day in Nary's Life", a cartoon story that plays like a
+// video. Each scene is a drawing (SVG) plus one English line and its Khmer
+// caption. **Bold** words in the English are past simple verbs.
+// Press ▶ Play: a voice reads each scene, then the next scene slides in.
+//
+// KHMER VOICE: put recordings in public/story/ named km-1.m4a … km-6.m4a
+// (or .mp3), one per scene. When "ខ្មែរ" is chosen, the story plays them.
+// Without a recording, it tries the phone's own Khmer voice, if it has one.
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Nary from '../components/story/Nary.astro';
+import Kid from '../components/story/Kid.astro';
+
+const title = "A Day in Nary's Life";
+const titleKm = 'មួយថ្ងៃរបស់ណារី';
+
+// The words of the story. Change them here.
+const scenes = [
+  {
+    en: 'Nary **woke up** at 6 o’clock. She **brushed** her teeth and **washed** her face.',
+    km: 'ណារីបានក្រោកពីដំណេកនៅម៉ោង ៦។ នាងបានដុសធ្មេញ និងលាងមុខ។',
+  },
+  {
+    en: 'She **ate** rice soup with her family.',
+    km: 'នាងបានញ៉ាំបបរជាមួយគ្រួសាររបស់នាង។',
+  },
+  {
+    en: 'Then she **rode** her bike to school.',
+    km: 'បន្ទាប់មក នាងបានជិះកង់ទៅសាលារៀន។',
+  },
+  {
+    en: 'At school, she **studied** English and **played** with her friends.',
+    km: 'នៅសាលា នាងបានរៀនភាសាអង់គ្លេស ហើយលេងជាមួយមិត្តភក្តិ។',
+  },
+  {
+    en: 'After school, she **helped** her mother at the market.',
+    km: 'ក្រោយម៉ោងសិក្សា នាងបានជួយម្តាយរបស់នាងនៅផ្សារ។',
+  },
+  {
+    en: 'At night, she **did** her homework and **went** to bed at 9 o’clock.',
+    km: 'នៅពេលយប់ នាងបានធ្វើកិច្ចការផ្ទះ ហើយចូលគេងនៅម៉ោង ៩។',
+  },
+];
+
+const bold = (text: string) => text.replace(/\*\*(.+?)\*\*/g, '<b class="rounded bg-sun/40 px-1">$1</b>');
+const plain = (text: string) => text.replace(/\*\*/g, '');
+// Finds the Khmer recording for each scene, if there is one.
+const kmAudio = scenes.map((_, i) => {
+  const file = ['m4a', 'mp3'].map((ext) => `km-${i + 1}.${ext}`).find((name) => fs.existsSync(path.join(process.cwd(), 'public/story', name)));
+  return file ? `/story/${file}` : '';
+});
+const stars = [[40, 30], [90, 60], [150, 25], [210, 50], [260, 20], [330, 45], [370, 80], [120, 95], [300, 100], [20, 110]];
+---
+
+<Base title={title}>
+  <Header />
+  <main class="bg-gradient-to-b from-[#eef0ff] to-paper py-10 sm:py-14">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6">
+      <p class="text-center text-sm font-bold tracking-widest text-brand">🎬 CARTOON STORY · រឿងតុក្កតា</p>
+      <h1 class="mt-2 text-center font-display text-3xl font-extrabold sm:text-5xl">
+        {title}
+        <span class="km" lang="km">{titleKm}</span>
+      </h1>
+
+      <!-- The "video" -->
+      <div class="mt-8 overflow-hidden rounded-3xl bg-white shadow-[0_10px_0_#d9dcf7] ring-2 ring-brand/15">
+        <div id="screen" class="relative aspect-[5/3] overflow-hidden bg-ink">
+          <!-- Scene 1: morning, brushing teeth -->
+          <svg data-scene viewBox="0 0 400 240" class="scene absolute inset-0 size-full" role="img" aria-label="Morning. Nary wakes up and brushes her teeth.">
+            <rect width="400" height="240" fill="#fff4dc" />
+            <rect x="40" y="40" width="110" height="80" rx="6" fill="#bfe6ff" stroke="#c98a4b" stroke-width="6" />
+            <path d="M95 40 L95 120 M40 80 L150 80" stroke="#c98a4b" stroke-width="4" />
+            <circle cx="125" cy="62" r="12" fill="#ffd36b" />
+            <rect x="270" y="50" width="70" height="50" rx="8" fill="#dff1ff" stroke="#9aa8b8" stroke-width="3" />
+            <rect x="260" y="120" width="90" height="60" rx="6" fill="#e9eef3" />
+            <rect y="200" width="400" height="40" fill="#e3c9a3" />
+            <rect x="40" y="150" width="120" height="40" rx="8" fill="#f7a8c4" />
+            <rect x="40" y="140" width="34" height="18" rx="6" fill="#fff" />
+            <Nary x={230} y={210} item="toothbrush" eyes="happy" home />
+            <text x="180" y="40" font-family="sans-serif" font-size="18" font-weight="800" fill="#e2475b">⏰ 6:00</text>
+          </svg>
+
+          <!-- Scene 2: breakfast with the family -->
+          <svg data-scene viewBox="0 0 400 240" class="scene absolute inset-0 size-full" role="img" aria-label="Nary eats rice soup with her family.">
+            <rect width="400" height="240" fill="#fde9d2" />
+            <rect y="200" width="400" height="40" fill="#d8b98a" />
+            <Kid x={110} y={175} scale={1.35} shirt="#7fb2e5" />
+            <Nary x={200} y={175} scale={1.05} eyes="happy" home />
+            <Kid x={290} y={175} scale={1.4} girl shirt="#c2378a" />
+            <rect x="60" y="150" width="280" height="14" rx="4" fill="#9c5a2e" />
+            <rect x="80" y="164" width="10" height="40" fill="#7a4b2a" />
+            <rect x="310" y="164" width="10" height="40" fill="#7a4b2a" />
+            <g fill="#fff" stroke="#d6d6d6">
+              <path d="M95 136 Q110 156 125 136 Z" /><path d="M185 136 Q200 156 215 136 Z" /><path d="M275 136 Q290 156 305 136 Z" />
+            </g>
+            <g stroke="#bbb" stroke-width="2" fill="none" opacity="0.8">
+              <path d="M200 130 Q196 122 200 114 Q204 106 200 98" /><path d="M110 130 Q106 122 110 114" /><path d="M290 130 Q286 122 290 114" />
+            </g>
+            <text x="340" y="50" font-size="22">🥣</text>
+          </svg>
+
+          <!-- Scene 3: riding a bike to school -->
+          <svg data-scene viewBox="0 0 400 240" class="scene absolute inset-0 size-full" role="img" aria-label="Nary rides her bike to school.">
+            <rect width="400" height="240" fill="#bfe6ff" />
+            <circle cx="340" cy="45" r="22" fill="#ffe27a" />
+            <g fill="#fff" opacity="0.9"><ellipse cx="80" cy="45" rx="30" ry="12" /><ellipse cx="200" cy="30" rx="26" ry="10" /></g>
+            <g>
+              <rect x="300" y="100" width="90" height="80" fill="#f4e3c3" />
+              <path d="M290 102 L345 70 L400 102 Z" fill="#e2475b" />
+              <text x="345" y="135" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="800" fill="#4053d6">SCHOOL</text>
+              <rect x="335" y="150" width="20" height="30" fill="#7a4b2a" />
+            </g>
+            <rect y="180" width="400" height="60" fill="#8ccf6a" />
+            <path d="M0 205 L400 205 L400 235 L0 235 Z" fill="#9a9a9a" />
+            <path d="M0 220 L400 220" stroke="#fff" stroke-width="3" stroke-dasharray="18 14" />
+            <g transform="translate(150 215)">
+              <g fill="none" stroke="#2b2620" stroke-width="4">
+                <circle cx="-30" cy="0" r="18" /><circle cx="30" cy="0" r="18" />
+              </g>
+              <path d="M-30 0 L-8 -26 L22 -26 L30 0 M-8 -26 L0 0 L22 -26 M22 -26 L18 -38" stroke="#e2475b" stroke-width="4" fill="none" stroke-linejoin="round" />
+              <rect x="-14" y="-30" width="14" height="4" rx="2" fill="#2b2620" />
+              <rect x="12" y="-40" width="14" height="4" rx="2" fill="#2b2620" />
+              <rect x="20" y="-34" width="14" height="10" rx="2" fill="#f4b33d" />
+            </g>
+            <Nary x={142} y={208} item="bag" eyes="happy" />
+            <g stroke="#4053d6" stroke-width="3" stroke-linecap="round" opacity="0.5">
+              <path d="M70 180 L95 180" /><path d="M60 195 L90 195" />
+            </g>
+          </svg>
+
+          <!-- Scene 4: English class and playing with friends -->
+          <svg data-scene viewBox="0 0 400 240" class="scene absolute inset-0 size-full" role="img" aria-label="At school Nary studies English and plays with her friends.">
+            <rect width="400" height="240" fill="#e8f4ff" />
+            <rect x="20" y="25" width="170" height="95" rx="6" fill="#2f5d3a" stroke="#7a4b2a" stroke-width="6" />
+            <text x="105" y="58" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#fff">I played.</text>
+            <text x="105" y="82" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#ffe27a">She studied.</text>
+            <text x="105" y="106" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#cde">ABC ✏️</text>
+            <rect y="190" width="400" height="50" fill="#9fd36f" />
+            <circle cx="255" cy="185" r="12" fill="#ff7a59" />
+            <path d="M244 181 Q255 176 266 181 M244 189 Q255 194 266 189" stroke="#fff" stroke-width="2" fill="none" />
+            <Kid x={215} y={210} scale={1.2} />
+            <Nary x={295} y={210} scale={1.05} wave eyes="happy" />
+            <Kid x={355} y={212} scale={1.15} girl shirt="#fff" />
+            <text x="250" y="60" font-size="22">🎉</text>
+          </svg>
+
+          <!-- Scene 5: helping mother at the market -->
+          <svg data-scene viewBox="0 0 400 240" class="scene absolute inset-0 size-full" role="img" aria-label="After school Nary helps her mother at the market.">
+            <rect width="400" height="240" fill="#ffe7c2" />
+            <path d="M40 60 L360 60 L340 30 L60 30 Z" fill="#e2475b" />
+            <path d="M60 30 L100 60 M100 30 L140 60 M140 30 L180 60 M180 30 L220 60 M220 30 L260 60 M260 30 L300 60 M300 30 L340 60" stroke="#fff" stroke-width="8" opacity="0.6" />
+            <rect x="50" y="60" width="8" height="120" fill="#7a4b2a" />
+            <rect x="342" y="60" width="8" height="120" fill="#7a4b2a" />
+            <rect y="190" width="400" height="50" fill="#c9a77a" />
+            <g transform="translate(170 205)">
+              <path d="M-16 0 L16 0 L12 -60 L-12 -60 Z" fill="#2e8b6e" />
+              <path d="M-12 -60 L12 -60 L10 -72 L-10 -72 Z" fill="#f7d77a" />
+              <circle cx="0" cy="-86" r="14" fill="#c98c5f" />
+              <path d="M-15 -86 Q-14 -103 0 -103 Q14 -103 15 -86 Q4 -95 -15 -86 Z" fill="#1e1612" />
+              <circle cx="0" cy="-104" r="6" fill="#1e1612" />
+              <path d="M-5 -79 Q0 -75 5 -79" stroke="#1e1612" stroke-width="1.6" fill="none" />
+              <g stroke="#1e1612" stroke-width="1.6" fill="none"><path d="M-8 -86 Q-5 -89 -2 -86" /><path d="M2 -86 Q5 -89 8 -86" /></g>
+            </g>
+            <Nary x={235} y={205} eyes="happy" home />
+            <rect x="60" y="140" width="280" height="18" rx="4" fill="#9c5a2e" />
+            <g>
+              <text x="75" y="138" font-size="22">🥭</text><text x="105" y="138" font-size="22">🍌</text>
+              <text x="270" y="138" font-size="22">🥬</text><text x="300" y="138" font-size="22">🍉</text>
+            </g>
+            <text x="200" y="100" font-family="sans-serif" font-size="13" font-weight="800" fill="#7a4b2a" text-anchor="middle">❤️</text>
+          </svg>
+
+          <!-- Scene 6: homework and bedtime -->
+          <svg data-scene viewBox="0 0 400 240" class="scene absolute inset-0 size-full" role="img" aria-label="At night Nary does her homework and goes to bed.">
+            <rect width="400" height="240" fill="#232860" />
+            <rect x="250" y="30" width="110" height="80" rx="6" fill="#1b1f4a" stroke="#c98a4b" stroke-width="6" />
+            <circle cx="320" cy="62" r="16" fill="#fff4c2" />
+            <circle cx="328" cy="57" r="14" fill="#1b1f4a" />
+            {stars.map(([sx, sy]) => sx > 250 && sy < 100 && <text x={sx} y={sy + 20} font-size="9" fill="#ffe27a">✦</text>)}
+            <rect y="200" width="400" height="40" fill="#3a3f7a" />
+            <!-- desk with lamp light -->
+            <path d="M60 60 L20 160 L140 160 Z" fill="#ffe27a" opacity="0.18" />
+            <rect x="20" y="160" width="140" height="10" rx="3" fill="#9c5a2e" />
+            <rect x="30" y="170" width="8" height="35" fill="#7a4b2a" /><rect x="142" y="170" width="8" height="35" fill="#7a4b2a" />
+            <path d="M60 60 L50 158 M45 60 L75 60 L68 48 L52 48 Z" stroke="#ccc" stroke-width="3" fill="#f4b33d" />
+            <rect x="80" y="150" width="34" height="10" fill="#fff" />
+            <!-- bed -->
+            <rect x="200" y="160" width="180" height="30" rx="8" fill="#f7a8c4" />
+            <rect x="200" y="150" width="50" height="22" rx="8" fill="#fff" />
+            <rect x="240" y="155" width="140" height="22" rx="8" fill="#7b5ea7" />
+            <circle cx="232" cy="152" r="13" fill="#c98c5f" />
+            <path d="M219 150 Q220 136 233 137 Q246 138 245 150 Q236 142 219 150 Z" fill="#1e1612" />
+            <g stroke="#1e1612" stroke-width="1.6" fill="none"><path d="M225 153 Q228 155 231 153" /><path d="M235 153 Q238 155 241 153" /></g>
+            <text x="250" y="130" font-family="sans-serif" font-size="18" font-weight="800" fill="#cbd1ff" opacity="0.8">z z z</text>
+            <text x="20" y="40" font-family="sans-serif" font-size="18" font-weight="800" fill="#ffe27a">🕘 9:00</text>
+          </svg>
+
+          <!-- Big play button over the picture at the start -->
+          <button id="big-play" type="button" class="absolute inset-0 flex items-center justify-center bg-ink/30 text-white">
+            <span class="flex size-20 items-center justify-center rounded-full bg-sun text-4xl text-ink shadow-[0_6px_0_#b9822a]">▶</span>
+          </button>
+        </div>
+
+        <!-- Words of the scene -->
+        <div class="p-5 sm:p-6">
+          {
+            scenes.map((s, i) => (
+              <div data-words class={i === 0 ? '' : 'hidden'} data-km-audio={kmAudio[i]}>
+                <p class="text-lg leading-relaxed sm:text-xl" set:html={bold(s.en)} data-say={plain(s.en)} />
+                <p class="km mt-1 text-base" lang="km" data-say-km={s.km}>{s.km}</p>
+              </div>
+            ))
+          }
+
+          <!-- Controls -->
+          <div class="mt-5 flex items-center justify-between gap-3">
+            <button id="prev" type="button" class="rounded-full bg-ink/5 px-4 py-3 font-bold hover:bg-ink/10" aria-label="Previous scene">◀</button>
+            <div id="dots" class="flex gap-2">
+              {scenes.map((_, i) => <button type="button" data-dot={i} aria-label={`Scene ${i + 1}`} class="size-3 rounded-full bg-ink/15" />)}
+            </div>
+            <button id="next" type="button" class="rounded-full bg-ink/5 px-4 py-3 font-bold hover:bg-ink/10" aria-label="Next scene">▶</button>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-3">
+            <button id="play" type="button" class="col-span-2 rounded-full bg-brand px-5 py-3 font-bold text-paper shadow-[0_5px_0_#2f3fae] active:translate-y-1 active:shadow-none">▶ Play story</button>
+            <div class="flex rounded-full bg-ink/5 p-1" role="group" aria-label="Voice language">
+              <button type="button" data-lang="en" class="flex-1 rounded-full px-3 py-2 font-bold">English</button>
+              <button type="button" data-lang="km" lang="km" class="flex-1 rounded-full px-3 py-2 font-bold font-khmer">ខ្មែរ</button>
+            </div>
+            <button id="sound" type="button" class="rounded-full bg-ink/5 px-5 py-3 font-bold hover:bg-ink/10">🔊 Voice on</button>
+          </div>
+          <p id="km-note" lang="km" class="mt-3 hidden rounded-xl bg-sun/20 p-3 text-center text-sm">
+            ទូរសព្ទនេះមិនមានសំឡេងខ្មែរទេ។ សូមអានអក្សរខ្មែរខាងលើ។ 📖
+          </p>
+        </div>
+      </div>
+
+      <!-- Practice -->
+      <div class="mt-8 rounded-3xl bg-white p-6 ring-1 ring-ink/5">
+        <h2 class="font-display text-2xl font-bold">
+          🔍 Find the past simple verbs!
+          <span class="km" lang="km">រកកិរិយាសព្ទកាលអតីតសាមញ្ញ!</span>
+        </h2>
+        <p class="mt-2 text-muted">
+          The yellow words are past simple. Can you say the base verb? (woke up → wake up)
+          <span class="km" lang="km">ពាក្យពណ៌លឿងជាកាលអតីតសាមញ្ញ។ តើអ្នកអាចនិយាយកិរិយាសព្ទដើមបានទេ? (woke up → wake up)</span>
+        </p>
+        <a href="/#quiz" class="mt-5 inline-block rounded-full bg-sun px-6 py-3 font-extrabold text-ink shadow-[0_5px_0_#b9822a] active:translate-y-1 active:shadow-none">
+          🎮 Play the quiz <span lang="km" class="font-khmer font-semibold">លេងការធ្វើតេស្ត</span>
+        </a>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* Scenes fade in and slowly zoom, like a cartoon film. */
+  .scene {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  .scene.on {
+    opacity: 1;
+    animation: drift 9s ease-out forwards;
+  }
+  @keyframes drift {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scene.on { animation: none; }
+  }
+</style>
+
+<script>
+  // Plays the story: shows one scene at a time, reads its words out loud,
+  // then moves on to the next scene.
+  const scenes = [...document.querySelectorAll<SVGElement>('[data-scene]')];
+  const words = [...document.querySelectorAll<HTMLElement>('[data-words]')];
+  const dots = [...document.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+  const playButton = document.getElementById('play')!;
+  const soundButton = document.getElementById('sound')!;
+  const bigPlay = document.getElementById('big-play')!;
+
+  let current = 0;
+  let playing = false;
+  let voiceOn = true;
+  let lang: 'en' | 'km' = 'en';
+  let timer: number | undefined;
+  let recording: HTMLAudioElement | null = null;
+  const canSpeak = 'speechSynthesis' in window;
+  const langButtons = [...document.querySelectorAll<HTMLButtonElement>('[data-lang]')];
+  const kmNote = document.getElementById('km-note')!;
+
+  // Does this phone or computer have its own Khmer voice?
+  const hasKhmerVoice = () => canSpeak && speechSynthesis.getVoices().some((v) => v.lang.toLowerCase().startsWith('km'));
+
+  function drawLang() {
+    langButtons.forEach((b) => {
+      const on = b.dataset.lang === lang;
+      b.classList.toggle('bg-white', on);
+      b.classList.toggle('shadow', on);
+      b.classList.toggle('text-brand', on);
+    });
+    // Warn when Khmer is chosen but there is no recording and no Khmer voice.
+    const missing = lang === 'km' && words.some((w) => !w.dataset.kmAudio) && !hasKhmerVoice();
+    kmNote.classList.toggle('hidden', !missing);
+  }
+
+  function show(i: number) {
+    current = (i + scenes.length) % scenes.length;
+    scenes.forEach((s, n) => s.classList.toggle('on', n === current));
+    words.forEach((w, n) => w.classList.toggle('hidden', n !== current));
+    dots.forEach((d, n) => {
+      d.classList.toggle('bg-brand', n === current);
+      d.classList.toggle('bg-ink/15', n !== current);
+    });
+  }
+
+  function stopTalking() {
+    clearTimeout(timer);
+    if (canSpeak) speechSynthesis.cancel();
+    recording?.pause();
+    recording = null;
+  }
+
+  // Read this scene, then go to the next one (or stop at the end).
+  // Khmer: a recording if there is one, else the device's Khmer voice,
+  // else no sound (the scene just waits a little longer).
+  function runScene() {
+    stopTalking();
+    if (!playing) return;
+    const scene = words[current];
+    const goOn = () => {
+      if (!playing) return;
+      if (current === scenes.length - 1) return setPlaying(false);
+      show(current + 1);
+      runScene();
+    };
+    const afterVoice = () => (timer = window.setTimeout(goOn, 900));
+    const silent = () => (timer = window.setTimeout(goOn, lang === 'km' ? 7000 : 5500));
+
+    if (!voiceOn) return silent();
+    if (lang === 'km' && scene.dataset.kmAudio) {
+      recording = new Audio(scene.dataset.kmAudio);
+      recording.onended = afterVoice;
+      recording.play().catch(silent);
+      return;
+    }
+    if (!canSpeak || (lang === 'km' && !hasKhmerVoice())) return silent();
+    const say = new SpeechSynthesisUtterance(
+      lang === 'km' ? scene.querySelector<HTMLElement>('[data-say-km]')!.dataset.sayKm! : scene.querySelector<HTMLElement>('[data-say]')!.dataset.say!,
+    );
+    say.lang = lang === 'km' ? 'km-KH' : 'en-US';
+    say.rate = 0.85;
+    say.onend = afterVoice;
+    speechSynthesis.speak(say);
+  }
+
+  function setPlaying(on: boolean) {
+    playing = on;
+    playButton.textContent = on ? '⏸ Pause' : '▶ Play story';
+    bigPlay.classList.add('hidden');
+    if (on) runScene();
+    else stopTalking();
+  }
+
+  playButton.addEventListener('click', () => {
+    if (!playing && current === scenes.length - 1) show(0);
+    setPlaying(!playing);
+  });
+  bigPlay.addEventListener('click', () => {
+    show(0);
+    setPlaying(true);
+  });
+  soundButton.addEventListener('click', () => {
+    voiceOn = !voiceOn;
+    soundButton.textContent = voiceOn ? '🔊 Voice on' : '🔇 Voice off';
+    if (playing) runScene();
+  });
+  document.getElementById('prev')!.addEventListener('click', () => {
+    show(current - 1);
+    if (playing) runScene();
+  });
+  document.getElementById('next')!.addEventListener('click', () => {
+    show(current + 1);
+    if (playing) runScene();
+  });
+  dots.forEach((d, n) =>
+    d.addEventListener('click', () => {
+      show(n);
+      if (playing) runScene();
+    }),
+  );
+  langButtons.forEach((b) =>
+    b.addEventListener('click', () => {
+      lang = b.dataset.lang as 'en' | 'km';
+      drawLang();
+      if (playing) runScene();
+    }),
+  );
+  // Voices can load a moment after the page; check again when they arrive.
+  if (canSpeak) speechSynthesis.addEventListener('voiceschanged', drawLang);
+
+  show(0);
+  drawLang();
+</script>

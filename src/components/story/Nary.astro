@@ -1,0 +1,75 @@
+---
+// Nary, the girl in the story: long black hair, school uniform (white shirt,
+// navy skirt). Drawn with SVG. x, y = where her feet are.
+// item: something she holds ('toothbrush', 'book', 'bag' or nothing).
+// eyes: 'open' or 'happy' (closed, smiling) or 'sleep'.
+interface Props {
+  x: number;
+  y: number;
+  scale?: number;
+  item?: 'toothbrush' | 'book' | 'bag';
+  eyes?: 'open' | 'happy' | 'sleep';
+  wave?: boolean;
+  home?: boolean;
+}
+const { x, y, scale = 1, item, eyes = 'open', wave = false, home = false } = Astro.props;
+const skin = '#c98c5f';
+const shirt = home ? '#f7a8c4' : '#ffffff';
+const skirt = home ? '#7b5ea7' : '#22336e';
+---
+
+<g transform={`translate(${x} ${y}) scale(${scale})`}>
+  <!-- hair behind -->
+  <path d="M-17 -98 Q-22 -70 -16 -58 L16 -58 Q22 -70 17 -98 Z" fill="#1e1612" />
+  <!-- legs and shoes -->
+  <rect x="-9" y="-26" width="7" height="24" rx="3" fill={skin} />
+  <rect x="2" y="-26" width="7" height="24" rx="3" fill={skin} />
+  <ellipse cx="-6" cy="-1" rx="6" ry="3" fill="#2b2620" />
+  <ellipse cx="6" cy="-1" rx="6" ry="3" fill="#2b2620" />
+  <!-- skirt and shirt -->
+  <path d="M-16 -22 L16 -22 L12 -44 L-12 -44 Z" fill={skirt} />
+  <path d="M-13 -42 L13 -42 L12 -66 Q0 -70 -12 -66 Z" fill={shirt} stroke="#d6d6d6" />
+  {!home && <path d="M-3 -66 L0 -58 L3 -66 Z" fill={skirt} />}
+  <!-- arms -->
+  <path d="M-12 -64 Q-20 -50 -16 -40" stroke={skin} stroke-width="6" fill="none" stroke-linecap="round" />
+  {
+    wave ? (
+      <path d="M12 -64 Q24 -74 22 -88" stroke={skin} stroke-width="6" fill="none" stroke-linecap="round" />
+    ) : (
+      <path d="M12 -64 Q20 -52 16 -42" stroke={skin} stroke-width="6" fill="none" stroke-linecap="round" />
+    )
+  }
+  {item === 'toothbrush' && (
+    <g>
+      <path d="M12 -64 Q16 -74 6 -78" stroke={skin} stroke-width="6" fill="none" stroke-linecap="round" />
+      <rect x="-2" y="-84" width="12" height="3" rx="1.5" fill="#4ab0ff" transform="rotate(-20 4 -82)" />
+      <circle cx="-8" cy="-80" r="2" fill="#fff" /><circle cx="-12" cy="-84" r="1.5" fill="#fff" />
+    </g>
+  )}
+  {item === 'book' && <rect x="10" y="-52" width="14" height="18" rx="2" fill="#e2475b" />}
+  {item === 'bag' && <rect x="-24" y="-62" width="12" height="20" rx="3" fill="#2f7fe0" />}
+  <!-- head -->
+  <rect x="-4" y="-74" width="8" height="6" fill={skin} />
+  <circle cx="0" cy="-86" r="14" fill={skin} />
+  <path d="M-15 -86 Q-14 -103 0 -103 Q14 -103 15 -86 Q8 -96 -2 -94 Q-10 -93 -15 -86 Z" fill="#1e1612" />
+  <circle cx="11" cy="-96" r="3" fill="#ff7aa8" />
+  {
+    eyes === 'open' && (
+      <g fill="#1e1612">
+        <circle cx="-5" cy="-85" r="1.8" />
+        <circle cx="5" cy="-85" r="1.8" />
+      </g>
+    )
+  }
+  {
+    eyes !== 'open' && (
+      <g stroke="#1e1612" stroke-width="1.6" fill="none" stroke-linecap="round">
+        <path d={eyes === 'sleep' ? 'M-8 -85 Q-5 -83 -2 -85' : 'M-8 -85 Q-5 -88 -2 -85'} />
+        <path d={eyes === 'sleep' ? 'M2 -85 Q5 -83 8 -85' : 'M2 -85 Q5 -88 8 -85'} />
+      </g>
+    )
+  }
+  {item !== 'toothbrush' && <path d="M-4 -79 Q0 -75 4 -79" stroke="#1e1612" stroke-width="1.6" fill="none" stroke-linecap="round" />}
+  <circle cx="-9" cy="-80" r="2.3" fill="#e86a6a" opacity="0.35" />
+  <circle cx="9" cy="-80" r="2.3" fill="#e86a6a" opacity="0.35" />
+</g>

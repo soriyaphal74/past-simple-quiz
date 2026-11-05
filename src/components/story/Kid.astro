@@ -1,0 +1,38 @@
+---
+// A cartoon child in a school uniform, drawn with SVG. x, y = feet.
+// girl: adds a ponytail and a skirt. sitting: shorter, for sitting on the ground.
+interface Props {
+  x: number;
+  y: number;
+  scale?: number;
+  girl?: boolean;
+  sitting?: boolean;
+  shirt?: string;
+}
+const { x, y, scale = 1, girl = false, sitting = false, shirt = '#ffffff' } = Astro.props;
+const skin = '#c98c5f';
+const bottom = girl ? '#2f4f9e' : '#1f2f5c';
+---
+
+<g transform={`translate(${x} ${y}) scale(${scale})`}>
+  {
+    sitting ? (
+      <ellipse cx="0" cy="-6" rx="18" ry="7" fill={bottom} />
+    ) : (
+      <g>
+        <rect x="-8" y="-22" width="6" height="22" rx="3" fill={skin} />
+        <rect x="2" y="-22" width="6" height="22" rx="3" fill={skin} />
+        <path d={girl ? 'M-14 -14 L14 -14 L10 -34 L-10 -34 Z' : 'M-11 -18 L11 -18 L11 -34 L-11 -34 Z'} fill={bottom} />
+      </g>
+    )
+  }
+  <path d={sitting ? 'M-12 -8 L12 -8 L10 -34 L-10 -34 Z' : 'M-12 -32 L12 -32 L10 -56 L-10 -56 Z'} fill={shirt} stroke="#d6d6d6" />
+  <g transform={sitting ? 'translate(0 22)' : ''}>
+    {girl && <path d="M8 -74 Q22 -70 16 -54" stroke="#1e1612" stroke-width="6" fill="none" stroke-linecap="round" />}
+    <circle cx="0" cy="-70" r="13" fill={skin} />
+    <path d="M-13 -71 A13 13 0 0 1 13 -71 Q12 -80 0 -83 Q-12 -80 -13 -71 Z" fill="#1e1612" />
+    <circle cx="-4" cy="-69" r="1.6" fill="#1e1612" />
+    <circle cx="4" cy="-69" r="1.6" fill="#1e1612" />
+    <path d="M-4 -64 Q0 -60 4 -64" stroke="#1e1612" stroke-width="1.5" fill="none" stroke-linecap="round" />
+  </g>
+</g>
